@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jeeta - Call Break Scoreboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-title"><span class="suit-mini">♠</span> Jeeta</div>
+  <button class="menu-btn" id="menuBtn" aria-label="Menu"><span></span><span></span><span></span></button>
+</div>
+
+<div class="menu-backdrop" id="menuBackdrop"></div>
+<div class="menu-panel" id="menuPanel">
+  <button class="menu-item" id="menuHome"><span class="ic">🏠</span> Home</button>
+  <button class="menu-item" id="menuNewGame"><span class="ic">🃏</span> New Game</button>
+  <button class="menu-item" id="menuAddRound"><span class="ic">➕</span> Add Round</button>
+  <div class="menu-divider"></div>
+  <button class="menu-item" id="menuSettings"><span class="ic">⚙️</span> Settings</button>
+  <button class="menu-item" id="menuAbout"><span class="ic">ℹ️</span> About This App</button>
+</div>
+
+<div class="modal-backdrop" id="aboutBackdrop">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2>About Jeeta</h2>
+      <button class="modal-close" id="aboutClose">✕</button>
+    </div>
+    <div class="about-logo"><div class="about-logo-badge">J</div></div>
+    <div class="about-body">
+      <p><strong>Jeeta</strong> is a simple, fast scorecard for Call Break — the four-player trick-taking card game played with a standard 52-card deck, where spades are always trump.</p>
+      <p>Each round, every player calls how many tricks they think they'll win, then plays the hand. Enter each player's <strong>Call</strong> and <strong>Won</strong> for the round, and Jeeta works out the score automatically — including the small overtrick bonus and the penalty for falling short — and keeps a running total across as many rounds as you play.</p>
+      <p>Add rounds as the game goes on, edit any value at any time, and use arrow keys to move quickly between boxes like a spreadsheet. Start a fresh game whenever you're ready for a new match.</p>
+      <p>Built for casual play with friends and family — no accounts, no ads, no internet connection needed. Everything stays on your device.</p>
+    </div>
+    <div class="about-meta">
+      <span>Version 1.0.0</span>
+      <span>Crafted by Rahul</span>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="settingsBackdrop">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2>Settings</h2>
+      <button class="modal-close" id="settingsClose">✕</button>
+    </div>
+    <div class="settings-row">
+      <div>
+        <div class="label">Start a new game</div>
+        <div class="hint">Clears all player names, calls, and scores</div>
+      </div>
+      <button class="settings-danger" id="settingsNewGame">New Game</button>
+    </div>
+    <div class="settings-row">
+      <div>
+        <div class="label">App version</div>
+        <div class="hint">Jeeta v1.0.0</div>
+      </div>
+    </div>
+    <div class="settings-row">
+      <div>
+        <div class="label">More settings</div>
+        <div class="hint">Additional options are coming in a future update</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <header>
+    <div class="suit-row">♠ &nbsp; ♥ &nbsp; ♦ &nbsp; ♣</div>
+    <h1>Jeeta <span>Call Break Scoreboard</span></h1>
+    <div class="subtitle">Four players &middot; spades are always trump &middot; enter each round's call and tricks won</div>
+  </header>
+
+  <div class="players" id="playersRow"></div>
+
+  <div class="table-scroll">
+    <div class="table-head-wrap" id="tableHeadWrap">
+      <table class="score-table" id="headTable">
+        <colgroup id="headColgroup"></colgroup>
+        <thead>
+          <tr id="headerRow"></tr>
+          <tr class="sub" id="subHeaderRow"></tr>
+        </thead>
+      </table>
+    </div>
+    <div class="table-body-wrap" id="tableBodyWrap">
+      <table class="score-table" id="bodyTable">
+        <colgroup id="bodyColgroup"></colgroup>
+        <tbody id="tableBody"></tbody>
+        <tfoot>
+          <tr id="totalsRow"></tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="controls">
+    <button class="action" id="addRoundBtn">+ Add Round</button>
+    <button class="action ghost" id="resetBtn">Reset All</button>
+  </div>
+
+  <div class="rules-note">
+    <strong>Scoring used here</strong> — for a call of <code>C</code> and tricks actually won <code>W</code>:<br>
+    &bull; Win exactly the call (<code>W = C</code>): score = <code>+C</code><br>
+    &bull; Win one more than the call (<code>W = C+1</code>): score = <code>+C.1</code> (small overtrick bonus)<br>
+    &bull; Fall short (<code>W &lt; C</code>): score = <code>−C</code> (negative mark)<br>
+    &bull; Win two or more above the call (<code>W ≥ C+2</code>): score = <code>−C</code> (also a negative mark, for overbidding too cautiously and sandbagging)
+    <br><br>
+    <strong>Round Total columns</strong> — <code>Calls</code> is just the sum of all four calls for that round; players are free to call however they like, so this can go above 13. <code>Won</code> is the sum of tricks the four players actually won — since a round only has 13 tricks in play, this can never exceed 13, and the app automatically caps what you can enter so the round's total stays at or under 13.
+    <br><br>
+    <strong>Low-call highlight</strong> — if the sum of all four players' calls in a round is less than 10, that whole round's row is tinted red so it stands out at a glance.
+  </div>
+
+  <footer class="credit-footer">
+    <svg class="bird bird-left" viewBox="0 0 64 40" aria-hidden="true">
+      <path d="M2 28 C10 18, 18 30, 24 20 C28 13, 34 10, 40 14 C36 8, 40 3, 48 4 C43 8, 44 13, 50 15 C44 15, 41 19, 44 24 C36 20, 30 26, 24 24 C18 30, 10 34, 2 28 Z"/>
+    </svg>
+    <span class="credit-text">Crafted by <strong>Rahul</strong></span>
+    <svg class="bird bird-right" viewBox="0 0 64 40" aria-hidden="true">
+      <path d="M2 28 C10 18, 18 30, 24 20 C28 13, 34 10, 40 14 C36 8, 40 3, 48 4 C43 8, 44 13, 50 15 C44 15, 41 19, 44 24 C36 20, 30 26, 24 24 C18 30, 10 34, 2 28 Z"/>
+    </svg>
+  </footer>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
